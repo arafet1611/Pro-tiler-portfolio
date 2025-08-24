@@ -40,10 +40,10 @@ const Contact = () => {
             <div className="max-w-4xl">
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-light tracking-wider text-gray-800 mb-2">
-                  CONTACT US
+                  NOUS CONTACTER
                 </h1>
                 <p className="text-gray-600 font-light text-sm">
-                  We'd love to hear from you!
+                  Nous serions ravis d'avoir de vos nouvelles !
                 </p>
               </div>
 
@@ -52,7 +52,7 @@ const Contact = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      FIRST NAME *
+                      PRÉNOM *
                     </label>
                     <input
                       type="text"
@@ -65,7 +65,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      LAST NAME *
+                      NOM *
                     </label>
                     <input
                       type="text"
@@ -78,7 +78,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      PROJECT DESCRIPTION*
+                      DESCRIPTION DU PROJET *
                     </label>
                     <textarea
                       name="projectDescription"
@@ -95,7 +95,7 @@ const Contact = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      EMAIL ADDRESS *
+                      ADRESSE EMAIL *
                     </label>
                     <input
                       type="email"
@@ -108,7 +108,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      PHONE *
+                      TÉLÉPHONE *
                     </label>
                     <input
                       type="tel"
@@ -121,11 +121,11 @@ const Contact = () => {
                   </div>
                 </div>
 
-                {/* Third Row - Subject and Project Location */}
+                {/* Third Row - Subject and Comments */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      SUBJECT*
+                      OBJET *
                     </label>
                     <input
                       type="text"
@@ -138,7 +138,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      COMMENTS
+                      COMMENTAIRES
                     </label>
                     <textarea
                       name="comments"
@@ -154,7 +154,7 @@ const Contact = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      PROJECT LOCATION*
+                      LIEU DU PROJET *
                     </label>
                     <input
                       type="text"
@@ -167,7 +167,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      BUDGET RANGE *
+                      BUDGET ESTIMÉ *
                     </label>
                     <select
                       name="budgetRange"
@@ -176,22 +176,21 @@ const Contact = () => {
                       className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                       required
                     >
-                      <option value="">Select Range</option>
-                      <option value="under-1000">Under 500 TND</option>
-                      <option value="1000-3000">500 - 1000 TND</option>
-                      <option value="3000-5000">1,000 - 3,000 TND</option>
-                      <option value="5000-10000">3,000 - 5,000 TND</option>
-                      <option value="over-10000">Over 5,000 TND</option>
+                      <option value="">Sélectionner une fourchette</option>
+                      <option value="under-200">Moins de 200 €</option>
+                      <option value="200-500">200 - 500 €</option>
+                      <option value="500-1000">500 - 1 000 €</option>
+                      <option value="1000-2000">1 000 - 2 000 €</option>
+                      <option value="over-2000">Plus de 2 000 €</option>
                     </select>
                   </div>
-                
                 </div>
 
                 {/* Fifth Row - Project Type and Location Selection */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      TYPE OF PROJECT*
+                      TYPE DE PROJET *
                     </label>
                     <select
                       name="projectType"
@@ -200,32 +199,31 @@ const Contact = () => {
                       className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                       required
                     >
-                      <option value="">Select Project Type</option>
-                      <option value="bathroom">Residential</option>
-                      <option value="kitchen">Commercial</option>
-                    
+                      <option value="">Sélectionner le type de projet</option>
+                      <option value="residential">Résidentiel</option>
+                      <option value="commercial">Commercial</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                      SELECT LOCATION*
+                      LOCALISATION *
                     </label>
-                <select
-  name="selectLocation"
-  value={formData.selectLocation}
-  onChange={handleInputChange}
-  className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-  required
->
-  <option value="">Select Location</option>
-  <option value="mahdia-city">Mahdia</option>
-  <option value="el-jem">El Jem</option>
-  <option value="sidi-alouane">Sidi Alouane</option>
-  <option value="chebba">Chebba</option>
-  <option value="ksour-essef">Ksour Essef</option>
-  <option value="souassi">Souassi</option>
-  <option value="other">Other</option>
-</select>
+                    <select
+                      name="selectLocation"
+                      value={formData.selectLocation}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
+                      required
+                    >
+                      <option value="">Sélectionner la localisation</option>
+                      <option value="mahdia-city">Mahdia</option>
+                      <option value="el-jem">El Jem</option>
+                      <option value="sidi-alouane">Sidi Alouane</option>
+                      <option value="chebba">Chebba</option>
+                      <option value="ksour-essef">Ksour Essef</option>
+                      <option value="souassi">Souassi</option>
+                      <option value="other">Autre</option>
+                    </select>
                   </div>
                 </div>
 
@@ -233,7 +231,7 @@ const Contact = () => {
                 <div className="pt-4">
                   <div className="mb-4">
                     <p className="text-xs font-light text-gray-600">
-                      EMAIL | +216 20 123 456 | TILE INSTALLATION INQUIRIES
+                      EMAIL | +216 20 123 456 | DEMANDES D'INSTALLATION DE CARRELAGE
                     </p>
                   </div>
                   
@@ -241,7 +239,7 @@ const Contact = () => {
                     type="submit"
                     className="w-full bg-gray-900 text-white py-3 px-6 text-xs font-light tracking-wider hover:bg-gray-800 transition-all duration-300"
                   >
-                    SEND YOUR MESSAGE
+                    ENVOYER VOTRE MESSAGE
                   </button>
                 </div>
               </form>
@@ -253,7 +251,7 @@ const Contact = () => {
             <div className="bg-gray-900 text-white p-6 h-full">
               
               {/* Logo/Brand */}
-              <div className="flex justify-center mb-4  -mt-16">
+              <div className="flex justify-center mb-4 -mt-16">
                 <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center">
                   <svg className="w-16 h-20 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -288,25 +286,22 @@ const Contact = () => {
               <div className="space-y-6">
                 {/* Main Office */}
                 <div className="text-center">
-                  <h3 className="text-lg font-light tracking-wide mb-2">MAHDIA (HQ)</h3>
+                  <h3 className="text-lg font-light tracking-wide mb-2">MAHDIA (SIÈGE SOCIAL)</h3>
                   <div className="space-y-1 text-xs text-gray-300 font-light">
                     <p>Avenue Habib Bourguiba</p>
                     <p>Mahdia 5100</p>
-                    <p>Tunisia</p>
+                    <p>Tunisie</p>
                     <p className="mt-2 text-white">+216 20 123 456</p>
                   </div>
                 </div>
 
-                {/* Service Areas */}
-               
-
                 {/* Service Hours */}
                 <div className="text-center pt-4 border-t border-gray-700">
-                  <h4 className="text-sm font-light tracking-wide mb-1">SERVICE HOURS</h4>
+                  <h4 className="text-sm font-light tracking-wide mb-1">HORAIRES DE SERVICE</h4>
                   <div className="space-y-1 text-xs text-gray-300 font-light">
-                    <p>Monday - Friday: 7:00 AM - 6:00 PM</p>
-                    <p>Saturday: 8:00 AM - 4:00 PM</p>
-                    <p>Sunday: By Appointment</p>
+                    <p>Lundi - Vendredi : 7h00 - 18h00</p>
+                    <p>Samedi : 8h00 - 16h00</p>
+                    <p>Dimanche : Sur rendez-vous</p>
                   </div>
                 </div>
               </div>

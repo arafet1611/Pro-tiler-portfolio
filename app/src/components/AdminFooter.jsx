@@ -12,10 +12,12 @@ export default function AdminFooter() {
 
           {/* Right side - Version info */}
           <div className="text-gray-500 text-sm">
-            Version 1.0.0
+           <span className="hidden sm:inline" >Version 1.0.0</span>
           </div>
         </div>
       </div>
+                  <div className="pb-12 md:pb-0"> </div>
+
     </footer>
   );
 }

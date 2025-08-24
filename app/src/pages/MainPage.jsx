@@ -3,11 +3,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Services from '../Components/Services';
 import FeaturedProjectsCarousel from '../Components/ImageCarousel ';
 import AboutMe from '../components/AboutMe';
-import Contact from '../Components/Contact';
+import ContactForm from '../components/ContactForm';
 
 function MainPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
-
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Hero slides data with navigation targets (FR - Carreleur professionnel)
   const heroSlides = [
     {
@@ -206,7 +208,7 @@ function MainPage() {
 
         {/* Contact Section */}
         <section id="contact">
-          <Contact />
+          <ContactForm />
         </section>
       </div>
     </>

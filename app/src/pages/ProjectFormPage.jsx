@@ -1,9 +1,21 @@
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, Upload, Plus, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Upload,
+  Plus,
+  X,
+  ArrowLeft,
+} from "lucide-react";
 import TopNavigation from "../components/TopNavigation";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
+
 export default function ProjectForm() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -13,6 +25,7 @@ export default function ProjectForm() {
     date: "",
     beforeAndAfterGallery: [],
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -36,7 +49,7 @@ export default function ProjectForm() {
       ...prev,
       beforeAndAfterGallery: [
         ...prev.beforeAndAfterGallery,
-        { beforeImage: null, afterImage: null, caption: "" },
+        { beforeImage: null, afterImage: null },
       ],
     }));
   };
@@ -65,8 +78,85 @@ export default function ProjectForm() {
     updateGalleryItem(i, field, file);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted data:", formData);
+  const navigateTo = (path) => {
+    // This assumes you're using React Router
+    // If using Next.js, you would use: router.push(path)
+    window.location.href = path;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitMessage("Création du projet en cours...");
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Append basic fields
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("location", formData.location);
+      formDataToSend.append("date", formData.date);
+
+      // Append main image
+      if (formData.mainImage) {
+        formDataToSend.append("mainImage", formData.mainImage);
+      }
+
+      // Append gallery images
+      formData.beforeAndAfterGallery.forEach((item, index) => {
+        if (item.beforeImage) {
+          formDataToSend.append(`beforeImage${index}`, item.beforeImage);
+        }
+        if (item.afterImage) {
+          formDataToSend.append(`afterImage${index}`, item.afterImage);
+        }
+      });
+
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create project");
+      }
+
+      const result = await response.json();
+      console.log("Project created successfully:", result);
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        category: "",
+        mainImage: null,
+        date: "",
+        beforeAndAfterGallery: [],
+      });
+      setCurrentPage(1);
+
+      // Show success message
+      setSubmitMessage("Projet créé avec succès! Redirection en cours...");
+
+      // Wait 1 seconds then navigate to dashboard
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setSubmitMessage("");
+        navigateTo("/admin/dashboard");
+      }, 1000);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      setSubmitMessage(
+        "Erreur lors de la création du projet. Veuillez réessayer."
+      );
+
+      // Hide error message after 5 seconds
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setSubmitMessage("");
+      }, 2000);
+    }
   };
 
   const nextPage = () => {
@@ -111,7 +201,7 @@ export default function ProjectForm() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
+    <div className="min-h-screen bg-gray-50">
       <TopNavigation />
       <div className="flex">
         <Sidebar />
@@ -119,6 +209,25 @@ export default function ProjectForm() {
         {/* Main Content */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
+            {/* Submission Alert */}
+            {isSubmitting && (
+              <div className="fixed top-4 right-4 z-50 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg">
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-3"></div>
+                  {submitMessage}
+                </div>
+              </div>
+            )}
+            {/* Header with back button */}
+            <div className="flex items-center mb-6">
+              <button
+                onClick={() => navigate("/admin/dashboard")}
+                className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+              >
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Retour
+              </button>
+            </div>
             {/* Header */}
             <div className="bg-white rounded-t-lg border-b">
               <div className="px-6 py-4">
@@ -170,14 +279,15 @@ export default function ProjectForm() {
                       placeholder="Saisir le titre"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       required
+                      disabled={isSubmitting}
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Un titre percutant attirera davantage l'attention des
-                      utilisateurs.
+                     Exemples: "Rénovation avec du carrelage premium " ou
+"Escalier avec du carrelage résistant au gel" ou
+"Crédence en carrelage type carreaux métro" 
                     </p>
                   </div>
 
-                  {/* Categories */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Localisation *
@@ -190,10 +300,11 @@ export default function ProjectForm() {
                         onChange={handleInputChange}
                         placeholder="Localisation"
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        disabled={isSubmitting}
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      ajoutez la localisation détaillée .{" "}
+    Exemples: "Saint-Germain, Paris" • "Vieux Lyon" • "Le Panier, Marseille" • "Capitole, Toulouse"
                     </p>
                   </div>
 
@@ -210,11 +321,12 @@ export default function ProjectForm() {
                       rows="6"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                       required
+                      disabled={isSubmitting}
                     />
+                
                     <p className="text-xs text-gray-500 mt-1">
-                      Plus vous en dites, mieux c'est! Plus vous en dites sur
-                      votre projet, plus les utilisateurs potentiels seront
-                      informés.
+                      Exemples: " Salle de bains • Cuisine • Terrasse • Sol • Mur • Crédence"
+
                     </p>
                   </div>
 
@@ -229,6 +341,7 @@ export default function ProjectForm() {
                       value={formData.date}
                       onChange={handleInputChange}
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      disabled={isSubmitting}
                     />
                   </div>
 
@@ -274,12 +387,13 @@ export default function ProjectForm() {
                           <button
                             onClick={() => removeGalleryItem(i)}
                             className="text-red-600 hover:text-red-800"
+                            disabled={isSubmitting}
                           >
                             <X className="h-5 w-5" />
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Image Avant
@@ -306,27 +420,13 @@ export default function ProjectForm() {
                             />
                           </div>
                         </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Légende (optionnel)
-                          </label>
-                          <input
-                            type="text"
-                            value={item.caption}
-                            onChange={(e) =>
-                              updateGalleryItem(i, "caption", e.target.value)
-                            }
-                            placeholder="Décrivez la transformation..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          />
-                        </div>
                       </div>
                     ))}
 
                     <button
                       onClick={addGalleryItem}
                       className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors"
+                      disabled={isSubmitting}
                     >
                       <Plus className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                       <p className="text-gray-600">
@@ -345,9 +445,9 @@ export default function ProjectForm() {
               <div className="flex justify-between items-center pt-6 mt-6 border-t">
                 <button
                   onClick={prevPage}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || isSubmitting}
                   className={`flex items-center px-4 py-2 rounded-md ${
-                    currentPage === 1
+                    currentPage === 1 || isSubmitting
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
@@ -359,7 +459,12 @@ export default function ProjectForm() {
                 {currentPage === 1 ? (
                   <button
                     onClick={nextPage}
-                    className="flex items-center px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    disabled={isSubmitting}
+                    className={`flex items-center px-6 py-2 rounded-md transition-colors ${
+                      isSubmitting
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-red-600 text-white hover:bg-red-700"
+                    }`}
                   >
                     Suivant
                     <ChevronRight className="h-4 w-4 ml-1" />
@@ -367,9 +472,14 @@ export default function ProjectForm() {
                 ) : (
                   <button
                     onClick={handleSubmit}
-                    className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 rounded-md transition-colors ${
+                      isSubmitting
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-red-600 text-white hover:bg-red-700"
+                    }`}
                   >
-                    Soumettre
+                    {isSubmitting ? "Création en cours..." : "Soumettre"}
                   </button>
                 )}
               </div>
@@ -377,6 +487,7 @@ export default function ProjectForm() {
           </div>
         </div>
       </div>
+      <div className="pb-12 md:pb-0"> </div>
     </div>
   );
 }

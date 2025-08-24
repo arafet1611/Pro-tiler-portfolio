@@ -14,11 +14,6 @@ const projectSchema = mongoose.Schema(
       type: String,
       required: false,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "category",
-      required: true,
-    },
 
     mainImage: {
       type: String,
@@ -29,7 +24,6 @@ const projectSchema = mongoose.Schema(
         {
           beforeImage: { type: String, required: true },
           afterImage: { type: String, required: true },
-          caption: { type: String },
         },
       ],
       default: [],
