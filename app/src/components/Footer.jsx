@@ -164,7 +164,8 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-gray-700 pt-4">
           <div className="text-xs text-gray-500 text-center">
-            © 2025 Farouk et cie. All rights reserved.
+© 2025 Farouk et Cie - Carreleur Professionnel. Tous droits réservés.
+
           </div>
         </div>
       </div>

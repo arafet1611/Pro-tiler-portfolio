@@ -7,7 +7,7 @@ import cloudinary from "../configs/cloudinary.js"; // You'll need to set up Clou
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "projects",
+    folder: "notes",
     format: async (req, file) => {
       // Determine format based on file mimetype
       const format = file.mimetype.split("/")[1];

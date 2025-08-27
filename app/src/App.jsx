@@ -11,7 +11,12 @@ import Projects from './pages/Projects';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BeforeAfterGallery from './pages/BeforeAfterGallery';
-import Contectpage from './pages/ContectPage';
+import Contactpage from './pages/ContactPage';
+import NotesApp from './pages/NotesPage';
+import AdminDashboard from './pages/AdminDashboard'
+import AdminProfile from './pages/AdminProfile';
+import AdminLoginPage from './pages/Adminlogin';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 function App() {
   return (
@@ -19,25 +24,53 @@ function App() {
       <div className="w-full mx-auto">
         <Router>
           <Routes>
-            {/* Admin routes without Navbar */}
+            <Route
+                      path="/admin-login"
+                      element={<AdminLoginPage />}
+                    />
+            <Route
+              path="/admin"
+              element={      <ProtectedAdminRoute>
+<AdminDashboard />      </ProtectedAdminRoute>
+}
+            />
             <Route
               path="/admin/dashboard/project-form"
-              element={<ProjectForm />}
+              element={      <ProtectedAdminRoute>
+<ProjectForm />      </ProtectedAdminRoute>
+}
             />
             <Route
               path="/admin/dashboard"
-              element={<ProjectDashboard />}
+              element={     <ProtectedAdminRoute>
+<ProjectDashboard />      </ProtectedAdminRoute>
+}
             />
             <Route
               path="/admin/dashboard/project-update/:id"
-              element={<ProjectUpdate />}
+              element={      <ProtectedAdminRoute>
+<ProjectUpdate />      </ProtectedAdminRoute>
+}
             />
             <Route
               path="/admin/alerts"
-              element={<AlertsTable />}
+              element={      <ProtectedAdminRoute>
+<AlertsTable />      </ProtectedAdminRoute>
+}
             />
-
-            {/* Public routes with Navbar */}
+            <Route
+              path="/admin/notes"
+              element={     <ProtectedAdminRoute>
+<NotesApp />      </ProtectedAdminRoute>
+}
+            />
+            <Route
+              path="/admin/Profile"
+              element={      <ProtectedAdminRoute>
+<AdminProfile />      </ProtectedAdminRoute>
+}
+            />
+            {/* Public routes with Navbar and Footer */}
             <Route
               path="/*"
               element={
@@ -48,13 +81,14 @@ function App() {
                       path="/"
                       element={<MainPage />}
                     />
+                     
                     <Route
                       path="/services"
                       element={<ServicesPage />}
                     />
                     <Route
                       path="/contact"
-                      element={<Contectpage />}
+                      element={<Contactpage />}
                     />
                     <Route
                       path="/projects"

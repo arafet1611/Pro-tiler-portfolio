@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail } from 'lucide-react';
-
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    subject: '',
-    projectLocation: '',
-    budgetRange: '',
-    projectType: '',
-    selectLocation: '',
-    projectDescription: '',
-    howDidYouHear: '',
-    comments: ''
+    firstName: "",
+    lastName: "",
+    phone: "",
+    placeAddress: "",
+    localisation: "",
+    projectDescription: "",
   });
 
   useEffect(() => {
@@ -86,37 +79,7 @@ const ContactPage = () => {
                         required
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        DESCRIPTION DU PROJET *
-                      </label>
-                      <textarea
-                        name="projectDescription"
-                        value={formData.projectDescription}
-                        onChange={handleInputChange}
-                        rows="2"
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300 resize-none"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Second Row - Contact Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        ADRESSE EMAIL *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-                        required
-                      />
-                    </div>
-                    <div>
+                  <div>
                       <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
                         TÉLÉPHONE *
                       </label>
@@ -131,36 +94,10 @@ const ContactPage = () => {
                     </div>
                   </div>
 
-                  {/* Third Row - Subject and Comments */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        OBJET *
-                      </label>
-                      <input
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        COMMENTAIRES
-                      </label>
-                      <textarea
-                        name="comments"
-                        value={formData.comments}
-                        onChange={handleInputChange}
-                        rows="2"
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300 resize-none"
-                      />
-                    </div>
-                  </div>
+                 
+               
 
-                  {/* Fourth Row - Project Details */}
+                  {/* second Row - Project Details */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
@@ -174,45 +111,6 @@ const ContactPage = () => {
                         className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
                         required
                       />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        BUDGET ESTIMÉ *
-                      </label>
-                      <select
-                        name="budgetRange"
-                        value={formData.budgetRange}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-                        required
-                      >
-                        <option value="">Choisir le budget</option>
-                        <option value="sous-200">Sous 200 €</option>
-                        <option value="200-500">200 € - 500 €</option>
-                        <option value="500-1000">500 € - 1 000 €</option>
-                        <option value="1000-2000">1 000 € - 2 000 €</option>
-                        <option value="over-2000">Plus de 2 000 €</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Fifth Row - Project Type and Location Selection */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
-                        TYPE DE PROJET *
-                      </label>
-                      <select
-                        name="projectType"
-                        value={formData.projectType}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 text-sm bg-gray-100 border-none focus:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-300"
-                        required
-                      >
-                        <option value="">Sélectionner le type de projet</option>
-                        <option value="residential">Résidentiel</option>
-                        <option value="commercial">Commercial</option>
-                      </select>
                     </div>
                     <div>
                       <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
@@ -237,11 +135,30 @@ const ContactPage = () => {
                     </div>
                   </div>
 
+                  {/* Fifth Row - Project Type and Location Selection */}
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-xs font-light tracking-wide text-gray-700 mb-1">
+              DESCRIPTION DU PROJET *
+                      </label>
+                   <textarea
+              name="projectDescription"
+              value={formData.projectDescription}
+              onChange={handleInputChange}
+              required
+              rows="6"
+              className="w-full px-4 py-4 bg-gray-100 border-0 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:bg-white transition-all duration-300 resize-none"
+              placeholder="Parlez-nous de votre vision du projet, vos préférences de style, calendrier et toute exigence spécifique..."
+            />
+                    </div>
+                  
+                  </div>
+
                   {/* Contact Info and Submit */}
                   <div className="pt-4">
                     <div className="mb-4">
                       <p className="text-xs font-light text-gray-600">
-                        EMAIL | +216 20 123 456 | DEMANDES D'INSTALLATION DE CARRELAGE
+                        username@exemple.com | +216 20 123 456 | DEMANDES D'INSTALLATION DE CARRELAGE
                       </p>
                     </div>
                     
@@ -269,44 +186,27 @@ const ContactPage = () => {
                   </div>
                 </div>
 
-                {/* Map Illustration */}
-                <div className="mb-6">
-                  <svg viewBox="0 0 400 200" className="w-full h-40 text-blue-400">
-                    {/* Tunisia outline */}
-                    <path
-                      d="M120 60 L180 40 L220 50 L260 45 L280 60 L300 80 L290 120 L270 140 L240 150 L200 155 L160 150 L140 140 L120 120 L110 100 L115 80 Z"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      fill="none"
-                    />
-                    {/* Mahdia marker */}
-                    <circle cx="240" cy="120" r="3" fill="#3b82f6" />
-                    <text x="250" y="125" className="text-[10px] fill-current">MAHDIA</text>
-                    
-                    {/* Other cities */}
-                    <circle cx="200" cy="100" r="2" fill="#60a5fa" />
-                    <text x="170" y="95" className="text-[10px] fill-current">SOUSSE</text>
-                    
-                    <circle cx="220" cy="90" r="2" fill="#60a5fa" />
-                    <text x="225" y="85" className="text-[10px] fill-current">MONASTIR</text>
-                  </svg>
-                </div>
 
                 {/* Contact Information */}
                 <div className="space-y-6">
                   {/* Main Office */}
-                  <div className="text-center">
+                  <div className="text-center pt-6">
                     <h3 className="text-lg font-light tracking-wide mb-2">MAHDIA (SIÈGE SOCIAL)</h3>
                     <div className="space-y-1 text-xs text-gray-300 font-light">
                       <p>Avenue Habib Bourguiba</p>
                       <p>Mahdia 5100</p>
                       <p>Tunisie</p>
-                      <p className="mt-2 text-white">+216 20 123 456</p>
                     </div>
                   </div>
-
+ <div className="text-center pt-6 border-t border-gray-700">
+    <h4 className="text-sm font-light tracking-wide mb-1 uppercase"> Ligne directe</h4>
+    <div className="space-y-1 text-xs text-gray-300 font-light">
+      <p className="text-white">+216 98 765 432</p>                       <p className="mt-2 text-white">+216 20 123 456</p>
+      <p className="text-xs">Disponible aux heures d'ouverture </p>
+    </div>
+  </div>
                   {/* Service Hours */}
-                  <div className="text-center pt-4 border-t border-gray-700">
+                  <div className="text-center pt-6 border-t border-gray-700">
                     <h4 className="text-sm font-light tracking-wide mb-1">HORAIRES DE SERVICE</h4>
                     <div className="space-y-1 text-xs text-gray-300 font-light">
                       <p>Lundi - Vendredi : 7h00 - 18h00</p>
@@ -360,12 +260,7 @@ const ContactPage = () => {
               </div>
             </div>
 
-            {/* Bottom Line */}
-            <div className="pt-4 border-t border-gray-700">
-              <p className="text-xs text-gray-400">
-                © 2024 Farouk et Cie - Carreleur Professionnel. Tous droits réservés.
-              </p>
-            </div>
+            
           </div>
         </div>
       </footer>

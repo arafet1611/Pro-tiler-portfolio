@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import TopNavigation from "../components/TopNavigation";
 import {
   Eye,
   Filter,
@@ -13,56 +15,122 @@ import {
   Calendar,
   User,
   FileText,
+  AlertCircle,
+  Search
 } from "lucide-react";
 
 const AlertsTable = () => {
-  const [alerts, setAlerts] = useState([
-    {
-      id: 1,
-      Subject: "tile installation inquiry",
-      decription: "Interested in tile installation for a residential project",
-      clientName: "Mohamed Ali",
-      dateTime: "15/08/2025",
-      status: "waiting",
-      phone: "50147852",
-      location: "Tunis",
-      budget: "2000-5000 DT",
-      type: "Residential",
-    },
-    {
-      id: 2,
-      Subject: "bathroom renovation consultation",
-      decription:
-        "Need consultation for complete bathroom renovation with modern tiles",
-      clientName: "Fatma Ben Ahmed",
-      dateTime: "14/08/2025",
-      status: "done",
-      phone: "98765432",
-      location: "Sousse",
-      budget: "3000-5000 DT",
-      type: "Renovation",
-    },
-    {
-      id: 3,
-      Subject: "kitchen flooring project",
-      decription:
-        "Looking for ceramic tiles for kitchen flooring, approximately 25 square meters",
-      clientName: "Ahmed Trabelsi",
-      dateTime: "13/08/2025",
-      status: "waiting",
-      phone: "22334455",
-      location: "Sfax",
-      budget: "1500-3000 DT",
-      type: "Residential",
-    },
-  ]);
-
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [allFormCount, setAllFormCount] = useState(0);
   const [waitingCount, setWaitingCount] = useState(0);
   const [doneCount, setDoneCount] = useState(0);
   const [cancelledCount, setCancelledCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [searchTerm, setSearchTerm] = useState("");
+const filteredAlerts = alerts.filter(alert => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      alert.clientName.toLowerCase().includes(searchLower) ||
+      alert.phone.toLowerCase().includes(searchLower) ||
+      alert.location.toLowerCase().includes(searchLower) ||
+      alert.email.toLowerCase().includes(searchLower) ||
+      alert.placeAddress.toLowerCase().includes(searchLower) ||
+      alert.decription.toLowerCase().includes(searchLower) ||
+      alert.status.toLowerCase().includes(searchLower) ||
+      alert.dateTime.toLowerCase().includes(searchLower)
+    );
+  });
+  // API base URL - adjust this to match your backend URL
+
+  // Fetch messages from backend
+  const fetchMessages = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/messages`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Transform backend data to match frontend format
+        const transformedAlerts = data.data.map(message => ({
+          id: message._id,
+          Subject: `${message.projectDescription.substring(0, 30)}...`,
+          decription: message.projectDescription,
+          clientName: `${message.firstName} ${message.lastName}`,
+          dateTime: new Date(message.createdAt).toLocaleDateString('fr-FR'),
+          status: message.status,
+          phone: message.phone,
+          location: message.localisation,
+
+          email: message.email,
+          placeAddress: message.placeAddress,
+          firstName: message.firstName,
+          lastName: message.lastName,
+        }));
+        
+        setAlerts(transformedAlerts);
+        setError(null);
+      } else {
+        throw new Error(data.message || 'Failed to fetch messages');
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching messages:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update message status
+  const updateMessageStatus = async (messageId, newStatus) => {
+    try {
+      const response = await fetch(`/api/messages/${messageId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update local state
+        setAlerts(prevAlerts =>
+          prevAlerts.map(alert =>
+            alert.id === messageId ? { ...alert, status: newStatus } : alert
+          )
+        );
+        
+        if (selectedAlert && selectedAlert.id === messageId) {
+          setSelectedAlert({ ...selectedAlert, status: newStatus });
+        }
+      } else {
+        throw new Error(data.message || 'Failed to update message status');
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error('Error updating message status:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   useEffect(() => {
     // Total alerts
     setAllFormCount(alerts.length);
@@ -84,7 +152,6 @@ const AlertsTable = () => {
     { name: "Cancelled", count: cancelledCount },
   ]);
 
-  // Update configuredAlerts whenever counts change
   useEffect(() => {
     setConfiguredAlerts([
       { name: "All Form Submissions", count: allFormCount },
@@ -128,22 +195,20 @@ const AlertsTable = () => {
     setIsModalOpen(true);
   };
 
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
     if (selectedAlert) {
-      setAlerts(
-        alerts.map((alert) =>
-          alert.id === selectedAlert.id
-            ? { ...alert, status: newStatus }
-            : alert
-        )
-      );
-      setSelectedAlert({ ...selectedAlert, status: newStatus });
+      await updateMessageStatus(selectedAlert.id, newStatus);
     }
   };
-  const totalPages = Math.ceil(alerts.length / itemsPerPage);
+
+  const handleRefresh = () => {
+    fetchMessages();
+  };
+
+   const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentAlerts = alerts.slice(startIndex, endIndex);
+  const currentAlerts = filteredAlerts.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -152,37 +217,110 @@ const AlertsTable = () => {
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAlert(null);
   };
 
+  // Loading state
+if (loading) {
   return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="sm:hidden h-12"></div>
+
+      <TopNavigation />
+      <div className="flex flex-1">
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-red-500 mx-auto mb-4" />
+            <p className="text-gray-600">Loading messages...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
+          <TopNavigation />
+          <div className="flex">
+            <Sidebar />
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Data</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center mx-auto"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Try Again
+          </button>
+        </div>
+      </div>
+      </div>
+      </div>
+    );
+  }
+
+  return (
+        <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
+          <TopNavigation />
+          <div className="flex">
+
+            <Sidebar />
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Alerts List
-            </h1>
-            <p className="text-gray-600">
+        <div>
+          <h1 className="md:text-2xl text-xl font-bold text-gray-900 mb-2">
+            Alerts List
+          </h1>
+          <p className="text-gray-600">
             <span className="hidden sm:inline"> A summary of contact form submissions and project inquiries</span> 
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="text-sm text-gray-600 bg-white px-3 py-2 rounded-lg border">
-  1st Aug 2025 to 16th Aug 2025
-            </div>
-          
-          </div>
+          </p>
         </div>
+        <div className="flex items-center space-x-3">
+          {/* Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search anything..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+          
+          <button
+            onClick={handleRefresh}
+            className="px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+          >
+            <RefreshCw className="md:w-4 md:h-4 h-5 w-5  md:mr-2" />
+          <span className="hidden sm:inline" >Refresh </span> 
+          </button>
+        </div>
+      </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Alerts Table */}
           <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="md:text-lg text-sm font-semibold text-gray-900">
                 CONTACT FORM ALERTS
               </h2>
             </div>
@@ -198,14 +336,13 @@ const AlertsTable = () => {
                       Date/Time
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Budget
+                      Phone
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -213,132 +350,142 @@ const AlertsTable = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {currentAlerts.map((alert) => (
-                    <tr
-                      key={alert.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {alert.clientName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {alert.dateTime}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
-                            alert.status
-                          )}`}
-                        >
-                          {getStatusIcon(alert.status)}
-                          <span className="ml-1.5 capitalize">
-                            {alert.status}
-                          </span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {alert.location}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {alert.budget}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleViewClick(alert)}
-                          className="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors flex items-center"
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          View
-                        </button>
+                  {currentAlerts.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                        No messages found
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    currentAlerts.map((alert) => (
+                      <tr
+                        key={alert.id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {alert.clientName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {alert.dateTime}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                              alert.status
+                            )}`}
+                          >
+                            {getStatusIcon(alert.status)}
+                            <span className="ml-1.5 capitalize">
+                              {alert.status}
+                            </span>
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {alert.location}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {alert.phone}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            onClick={() => handleViewClick(alert)}
+                            className="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors flex items-center"
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                {/* Pagination Info */}
-                <div className="flex items-center text-sm text-gray-700">
-                  <span>
-                    Showing {startIndex + 1} to{" "}
-                    {Math.min(endIndex, alerts.length)} of {alerts.length}{" "}
-                    results
-                  </span>
-                </div>
-
-                {/* Pagination Controls */}
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      currentPage === 1
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span className="hidden sm:inline">←</span> Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="flex items-center space-x-1">
-                    {Array.from({ length: totalPages }, (_, index) => {
-                      const page = index + 1;
-                      const isCurrentPage = page === currentPage;
-
-                      // Show first page, last page, current page, and pages around current
-                      const showPage =
-                        page === 1 ||
-                        page === totalPages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1);
-
-                      if (!showPage) {
-                        // Show ellipsis
-                        if (
-                          page === currentPage - 2 ||
-                          page === currentPage + 2
-                        ) {
-                          return (
-                            <span key={page} className="px-2 text-gray-400">
-                              ...
-                            </span>
-                          );
-                        }
-                        return null;
-                      }
-
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            isCurrentPage
-                              ? "bg-red-500 text-white"
-                              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    })}
+            
+            {alerts.length > 0 && (
+              <div className="px-6 py-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  {/* Pagination Info */}
+                  <div className="flex items-center text-sm text-gray-700">
+                    <span>
+                      Showing {startIndex + 1} to{" "}
+                      {Math.min(endIndex, alerts.length)} of {alerts.length}{" "}
+                      results
+                    </span>
                   </div>
 
-                  <button
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      currentPage === totalPages
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-  Next <span className="hidden sm:inline">→</span>
-                  </button>
+                  {/* Pagination Controls */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        currentPage === 1
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      <span className="hidden sm:inline">←</span> Previous
+                    </button>
+
+                    {/* Page Numbers */}
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: totalPages }, (_, index) => {
+                        const page = index + 1;
+                        const isCurrentPage = page === currentPage;
+
+                        // Show first page, last page, current page, and pages around current
+                        const showPage =
+                          page === 1 ||
+                          page === totalPages ||
+                          (page >= currentPage - 1 && page <= currentPage + 1);
+
+                        if (!showPage) {
+                          // Show ellipsis
+                          if (
+                            page === currentPage - 2 ||
+                            page === currentPage + 2
+                          ) {
+                            return (
+                              <span key={page} className="px-2 text-gray-400">
+                                ...
+                              </span>
+                            );
+                          }
+                          return null;
+                        }
+
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                              isCurrentPage
+                                ? "bg-red-500 text-white"
+                                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        currentPage === totalPages
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Next <span className="hidden sm:inline">→</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Configured Alerts Sidebar */}
@@ -376,7 +523,7 @@ const AlertsTable = () => {
               {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <h3 className="text-xl font-semibold text-gray-900">
-                  Alert Details
+                  Message Details
                 </h3>
                 <button
                   onClick={closeModal}
@@ -442,105 +589,102 @@ const AlertsTable = () => {
                     </div>
 
                     <div className="flex items-center">
-                      <DollarSign className="w-5 h-5 text-red-500 mr-3" />
+                      <FileText className="w-5 h-5 text-red-500 mr-3" />
                       <div>
                         <p className="text-sm font-medium text-gray-500">
-                          Budget Range
+                          Email
                         </p>
-                        <p className="text-base font-semibold text-gray-900">
-                          {selectedAlert.budget}
+                        <p className="text-base text-gray-900">
+                          {selectedAlert.email}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center">
-                      <FileText className="w-5 h-5 text-red-500 mr-3" />
+                      <MapPin className="w-5 h-5 text-red-500 mr-3" />
                       <div>
                         <p className="text-sm font-medium text-gray-500">
-                          Project Type
+                          Project Address
                         </p>
                         <p className="text-base text-gray-900">
-                          {selectedAlert.type}
+                          {selectedAlert.placeAddress}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Subject and Description */}
+                {/* Project Description */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-2">
-                      Subject
+                      Project Description
                     </p>
-                    <p className="text-lg font-semibold text-gray-900 capitalize">
-                      {selectedAlert.Subject}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-2">
-                      Description
-                    </p>
-                    <p className="text-base text-gray-700 leading-relaxed">
+                    <p className="text-base text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
                       {selectedAlert.decription}
                     </p>
                   </div>
                 </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-medium text-gray-900">
-                    Current Status
-                  </h4>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
-                      selectedAlert.status
-                    )}`}
-                  >
-                    {getStatusIcon(selectedAlert.status)}
-                    <span className="ml-2 capitalize">
-                      {selectedAlert.status}
-                    </span>
-                  </span>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleStatusChange("waiting")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedAlert.status === "waiting"
-                        ? "bg-orange-500 text-white"
-                        : "bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100"
-                    }`}
-                  >
-                    <Clock className="w-4 h-4 inline mr-1" />
-                    Mark as Waiting
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange("done")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedAlert.status === "done"
-                        ? "bg-green-500 text-white"
-                        : "bg-green-50 text-green-600 border border-green-200 hover:bg-green-100"
-                    }`}
-                  >
-                    <CheckCircle className="w-4 h-4 inline mr-1" />
-                    Mark as Done
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange("cancelled")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedAlert.status === "cancelled"
-                        ? "bg-red-500 text-white"
-                        : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                    }`}
-                  >
-                    <XCircle className="w-4 h-4 inline mr-1" />
-                    Mark as Cancelled
-                  </button>
+                {/* Status Management */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-lg font-medium text-gray-900">
+                      Current Status
+                    </h4>
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                        selectedAlert.status
+                      )}`}
+                    >
+                      {getStatusIcon(selectedAlert.status)}
+                      <span className="ml-2 capitalize">
+                        {selectedAlert.status}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleStatusChange("waiting")}
+                      disabled={selectedAlert.status === "waiting"}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        selectedAlert.status === "waiting"
+                          ? "bg-orange-500 text-white cursor-not-allowed"
+                          : "bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100"
+                      }`}
+                    >
+                      <Clock className="w-4 h-4 inline mr-1" />
+                      Mark as Waiting
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange("done")}
+                      disabled={selectedAlert.status === "done"}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        selectedAlert.status === "done"
+                          ? "bg-green-500 text-white cursor-not-allowed"
+                          : "bg-green-50 text-green-600 border border-green-200 hover:bg-green-100"
+                      }`}
+                    >
+                      <CheckCircle className="w-4 h-4 inline mr-1" />
+                      Mark as Done
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange("cancelled")}
+                      disabled={selectedAlert.status === "cancelled"}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        selectedAlert.status === "cancelled"
+                          ? "bg-red-500 text-white cursor-not-allowed"
+                          : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                      }`}
+                    >
+                      <XCircle className="w-4 h-4 inline mr-1" />
+                      Mark as Cancelled
+                    </button>
+                  </div>
                 </div>
               </div>
+
               {/* Modal Footer */}
               <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
                 <button
@@ -549,18 +693,15 @@ const AlertsTable = () => {
                 >
                   Close
                 </button>
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  Save Changes
-                </button>
               </div>
             </div>
           </div>
         )}
       </div>
     </div>
+    </div>
+    <div className="h-16"></div>
+        </div>
   );
 };
 

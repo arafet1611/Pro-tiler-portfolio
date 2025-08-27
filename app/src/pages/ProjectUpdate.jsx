@@ -61,6 +61,8 @@ const ProjectUpdate = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
           <TopNavigation />
         <div className="sm:flex">
             <Sidebar />
@@ -78,6 +80,8 @@ const ProjectUpdate = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
           <TopNavigation />
         <div className="sm:flex">
             <Sidebar />
@@ -112,6 +116,8 @@ const ProjectUpdate = () => {
   if (!project) {
     return (
       <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
           <TopNavigation />
         <div className="sm:flex">
             <Sidebar />
@@ -139,6 +145,8 @@ const ProjectUpdate = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
         <TopNavigation />
 
       <div className="sm:flex">

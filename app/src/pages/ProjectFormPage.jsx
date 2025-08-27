@@ -191,6 +191,8 @@ export default function ProjectForm() {
       <label htmlFor={`upload-${label}-${index}`} className="cursor-pointer">
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <p className="text-gray-600 mb-2">
+                        {console.log("file",file)}
+
           {file ? file.name : `Cliquer ou déposer ${label}`}
         </p>
         <p className="text-sm text-gray-500">
@@ -202,6 +204,8 @@ export default function ProjectForm() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
       <TopNavigation />
       <div className="flex">
         <Sidebar />

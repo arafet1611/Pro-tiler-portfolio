@@ -138,26 +138,30 @@ export default function ProjectDashboard() {
     return `Il y a ${Math.floor(diffInDays / 365)} ans`;
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <TopNavigation />
-        <div className="sm:flex">
-          <Sidebar />
-          <div className="flex-1 p-6">
-            <div className="flex justify-center items-center h-64">
-              <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mr-2" />
-              <span className="text-gray-600">Chargement des projets...</span>
-            </div>
+ if (loading) {
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="sm:hidden h-12"></div>
+
+      <TopNavigation />
+      <div className="flex flex-1">
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-red-500 mx-auto mb-4" />
+            <p className="text-gray-600">Loading messages...</p>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
         <TopNavigation />
         <div className="sm:flex">
           <Sidebar />
@@ -180,6 +184,8 @@ export default function ProjectDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="sm:hidden h-12"></div>
+
       <TopNavigation />
 
       <div className="sm:flex">
