@@ -1,4 +1,4 @@
-import Project from "../Model/projectModel.js";
+import Project from "../model/projectModel.js";
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../configs/cloudinary.js"; // You'll need to set up Cloudinary config

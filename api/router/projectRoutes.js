@@ -9,7 +9,7 @@ import {
   upload,
   updateProjectGallery,
   deleteGalleryItem,
-} from "../Controller/projectController.js";
+} from "../controller/projectController.js";
 
 const router = express.Router();
 router.get("/", getProjects);

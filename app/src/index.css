@@ -1,7 +1,32 @@
 
 
 @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=Syne:wght@400;500;700;800&display=swap");
+@layer base {
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear,
+  input[type="password"]::-webkit-credentials-auto-fill-button,
+  input[type="password"]::-webkit-password-toggle-button {
+    display: none !important;
+    -webkit-appearance: none;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  .mobile-navbar, .mobile-bottom-nav {
+    display: flex !important;
+  }
+}
 
+@media (min-width: 900px) {
+  .mobile-navbar, .mobile-bottom-nav {
+    display: none !important;
+  }
+  .desktop-sidebar {
+    display: flex !important;
+  }
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
